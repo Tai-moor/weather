@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Weather App</title>
+<link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <div class="container">
+      <h2>Weather App</h2>
+      <div class="search-box">
+        <input type="text" id="city" placeholder="Enter city" />
+        <button id="go">Get Weather</button>
+        <select id="method">
+          <option value="fetch">Fetch</option>
+          <option value="axios">Axios</option>
+        </select>
+      </div>
+
+      <div id="err"></div>
+
+      <div class="loader" id="loader"></div>
+
+      <div class="weather-info">
+        <img id="icon" src="" alt="" />
+        <div>City: <span id="cityName">—</span></div>
+        <div>Temperature: <span id="temp">—</span></div>
+        <div>Condition: <span id="condition">—</span></div>
+        <div>Feels Like: <span id="feels">—</span></div>
+        <div>Humidity: <span id="hum">—</span></div>
+        <div>Wind: <span id="wind">—</span></div>
+        <div>Local Time: <span id="localTime">—</span></div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="weather.js">
+ 
+    </script>
+  </body>
+</html>

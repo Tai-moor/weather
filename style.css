@@ -1,0 +1,91 @@
+      @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap");
+
+      body {
+        font-family: "Roboto", sans-serif;
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: background 1s ease;
+        background: linear-gradient(to right, #6dd5ed, #2193b0);
+        color: #fff;
+      }
+
+      .container {
+        background: rgba(0, 0, 0, 0.5);
+        padding: 30px;
+        border-radius: 12px;
+        text-align: center;
+        width: 360px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        transition: transform 0.3s ease;
+        position: relative;
+      }
+
+      .container:hover {
+        transform: translateY(-5px);
+      }
+
+      input,
+      select,
+      button {
+        padding: 10px 15px;
+        margin: 5px;
+        border-radius: 6px;
+        border: none;
+        font-size: 16px;
+      }
+
+      button {
+        background: #ffcc00;
+        color: #000;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+
+      button:hover {
+        background: #ffe680;
+      }
+
+      #err {
+        display: none;
+        background: rgba(255, 204, 0, 0.2);
+        color: #ffe680;
+        padding: 8px 12px;
+        border-radius: 6px;
+        margin-top: 10px;
+        border-left: 4px solid #ffcc00;
+        text-align: center;
+        font-weight: 500;
+        font-size: 16px;
+      }
+
+      .weather-info {
+        margin-top: 20px;
+      }
+
+      .weather-info img {
+        width: 100px;
+      }
+
+      .weather-info div {
+        margin: 5px 0;
+        font-size: 18px;
+      }
+
+      .weather-info span {
+        font-weight: bold;
+      }
+
+      .loader {
+        border: 6px solid rgba(255, 255, 255, 0.2);
+        border-top: 6px solid #ffcc00;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+        margin: 20px auto;
+        display: none; 
+      }
