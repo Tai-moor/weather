@@ -19,8 +19,6 @@ const out = {
   localTime: el("localTime"),
 };
 
-const online = () => navigator.onLine;
-
 function showError(msg) {
   errBox.textContent = msg;
   errBox.style.display = "block";
@@ -62,11 +60,21 @@ function setBackground(condition) {
 }
 
 function render(data) {
-  if (!data || data.error)
-    throw new Error(data?.error?.message || "Unknown error");
+  if (!data || data.error) {
+    const code = data?.error?.code;
+    if (code === 1002)
+      throw new Error("Invalid API key. Please update your configuration.");
+    if (code === 1006)
+      throw new Error("City not found. Please check the spelling.");
+    throw new Error(
+      data?.error?.message || "Something went wrong. Please try again."
+    );
+  }
 
   const { location, current } = data;
-  out.cityName.textContent = `${location.name}`;
+
+  out.cityName.textContent = `${location.name}, ${location.country}`;
+
   out.icon.src = `https:${current.condition.icon}`;
   out.icon.alt = current.condition.text;
   out.temp.textContent = `${Math.round(current.temp_c)}°C`;
@@ -88,10 +96,17 @@ function hideLoader() {
   loader.style.display = "none";
 }
 
+// Unified error formatter
+function formatError(e) {
+  const msg = e?.message?.toLowerCase() || "";
+  if (msg.includes("failed to fetch"))
+    return "Unable to connect. Check your internet or try again.";
+  return e.message || "Something went wrong. Please try again.";
+}
+
 // Fetch method
 async function loadWithFetch() {
   clearError();
-  if (!online()) return showError("You appear to be offline.");
   const q = cityInput.value.trim();
   if (!q) return showError("Please enter a city name.");
 
@@ -101,7 +116,7 @@ async function loadWithFetch() {
     const data = await response.json();
     render(data);
   } catch (e) {
-    showError(e.message || "Something went wrong. Please try again.");
+    showError(formatError(e));
   } finally {
     hideLoader();
   }
@@ -110,7 +125,6 @@ async function loadWithFetch() {
 // Axios method
 async function loadWithAxios() {
   clearError();
-  if (!online()) return showError("You appear to be offline.");
   const q = cityInput.value.trim();
   if (!q) return showError("Please enter a city name.");
 
@@ -119,21 +133,83 @@ async function loadWithAxios() {
     const response = await axios.get(buildUrl(q));
     render(response.data);
   } catch (e) {
-    const message =
-      e.response?.data?.error?.message ||
-      e.message ||
-      "Something went wrong. Please try again.";
+    const message = e.response?.data?.error?.message || formatError(e);
     showError(message);
   } finally {
     hideLoader();
   }
 }
 
+//CallBck
+function loadWithCallback() {
+  const q = cityInput.value.trim();
+  if (!q) return showError("Please enter a city name.");
+
+  showLoader();
+
+  const xhr = new XMLHttpRequest();
+  xhr.open("GET", buildUrl(q));
+
+  xhr.onload = () => {
+    hideLoader();
+    if (xhr.status === 200) {
+      try {
+        render(JSON.parse(xhr.responseText));
+      } catch (err) {
+        showError("Invalid response: " + err.message);
+      }
+    } else {
+      showError("Request failed: " + xhr.status);
+    }
+  };
+
+  xhr.onerror = () => {
+    hideLoader();
+    showError("Network error occurred.");
+  };
+
+  xhr.send();
+}
+
+// Async JS method
+function loadWithAsyncJS() {
+  clearError();
+  const q = cityInput.value.trim();
+  if (!q) return showError("Please enter a city name.");
+
+  showLoader();
+  new Promise((resolve, reject) => {
+    fetch(buildUrl(q))
+      .then((res) => {
+        if (!res.ok)
+          reject(new Error("Request failed with status " + res.status));
+        return res.json();
+      })
+      .then(resolve)
+      .catch(reject);
+  })
+    .then((data) => render(data))
+    .catch((err) => showError(formatError(err)))
+    .finally(() => hideLoader());
+}
+
 btn.addEventListener("click", () => {
-  methodSelect.value === "fetch" ? loadWithFetch() : loadWithAxios();
+  switch (methodSelect.value) {
+    case "fetch":
+      loadWithFetch();
+      break;
+    case "axios":
+      loadWithAxios();
+      break;
+    case "callback":
+      loadWithCallback();
+      break;
+    case "asyncjs":
+      loadWithAsyncJS();
+      break;
+  }
 });
 
+// Default city
 cityInput.value = "Karachi";
-setTimeout(() => {
-  methodSelect.value === "fetch" ? loadWithFetch() : loadWithAxios();
-}, 300);
+setTimeout(loadWithFetch, 300);
