@@ -167,7 +167,6 @@ function loadWithCallback() {
     hideLoader();
     showError("Network error occurred.");
   };
-
   xhr.send();
 }
 
